@@ -1,112 +1,14 @@
-import { useMemo, useState } from 'react';
-import { ArrowDownToLine, ArrowRight, BookOpen, CalendarDays, ChevronDown, FileText, Menu, Search, X } from 'lucide-react';
-
-const issues = [];
-
-const years = ['Барлық жыл', '2026', '2025', '2024', '2023'];
-
-function LogoPlaceholder() {
-  return <div className="logo-placeholder" aria-label="Логотипті кейін қосуға арналған орын">
-    <span className="logo-mark">ТТ</span>
-    <span className="logo-caption">ЛОГОТИП</span>
-  </div>;
-}
-
-function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  return <header className="site-header">
-    <div className="topline"><div className="container topline-inner">
-      <span>Аудандық қоғамдық-саяси газет</span>
-      <span className="topline-right">Торғай өңірінің тынысы</span>
-    </div></div>
-    <div className="container header-main">
-      <a className="brand" href="#home" aria-label="Торғай тынысы — басты бет">
-        <LogoPlaceholder />
-        <span className="brand-copy"><strong>Торғай тынысы</strong><small>ЭЛЕКТРОНДЫ ГАЗЕТ МҰРАҒАТЫ</small></span>
-      </a>
-      <button className="mobile-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Мәзірді ашу">{menuOpen ? <X /> : <Menu />}</button>
-      <nav className={menuOpen ? 'main-nav open' : 'main-nav'}>
-        <a href="#home" onClick={() => setMenuOpen(false)}>Басты бет</a>
-        <a href="#archive" onClick={() => setMenuOpen(false)}>Газет мұрағаты</a>
-        <a href="#about" onClick={() => setMenuOpen(false)}>Біз туралы</a>
-        <a href="#contact" onClick={() => setMenuOpen(false)}>Байланыс</a>
-      </nav>
-    </div>
-  </header>;
-}
-
-function IssueCard({ issue }) {
-  return <article className="issue-card">
-    <div className="cover-wrap">
-      {issue.cover ? <img src={issue.cover} alt={issue.title} /> : <div className="cover-placeholder">
-        <span className="cover-kicker">АУДАНДЫҚ ГАЗЕТ</span>
-        <strong>Торғай<br/>тынысы</strong>
-        <span className="cover-rule" />
-        <span className="cover-date">{issue.date}</span>
-        <span className="cover-number">№ {issue.number}</span>
-      </div>}
-      <span className="issue-badge">PDF</span>
-    </div>
-    <div className="issue-info">
-      <div className="issue-meta"><span>№ {issue.number}</span><span>{issue.date}</span></div>
-      <h3>{issue.title || 'Газеттің жаңа саны'}</h3>
-      <div className="issue-actions">
-        <a className="button button-primary" href={issue.pdf || '#'} target={issue.pdf ? '_blank' : undefined} rel="noreferrer"><BookOpen size={16}/> Оқу</a>
-        <a className="icon-button" href={issue.pdf || '#'} download aria-label="PDF жүктеу"><ArrowDownToLine size={18}/></a>
-      </div>
-    </div>
-  </article>;
-}
-
-function App() {
-  const [query, setQuery] = useState('');
-  const [year, setYear] = useState('Барлық жыл');
-  const [showAll, setShowAll] = useState(false);
-  const filtered = useMemo(() => issues.filter(issue => {
-    const matchesYear = year === 'Барлық жыл' || issue.year === year;
-    const matchesQuery = `${issue.number} ${issue.date} ${issue.title || ''}`.toLowerCase().includes(query.toLowerCase());
-    return matchesYear && matchesQuery;
-  }), [query, year]);
-  const visible = showAll ? filtered : filtered.slice(0, 6);
-
-  return <><Header />
-    <main id="home">
-      <section className="hero">
-        <div className="hero-pattern" />
-        <div className="container hero-content">
-          <div className="eyebrow"><span /> ТОРҒАЙ ӨҢІРІНІҢ ҮНІ</div>
-          <h1>Торғай тынысы</h1>
-          <p className="hero-lead">Аудандық қоғамдық-саяси газетінің<br className="desktop-break"/> электронды мұрағаты</p>
-          <p className="hero-sub">Өткен күннің шежіресі — бүгінгі ұрпаққа аманат.</p>
-          <a className="button button-light" href="#archive">Газет сандарын көру <ArrowRight size={17}/></a>
-          <div className="hero-stamp"><span>БАСЫЛЫМ</span><strong>ТТ</strong><span>ЭЛЕКТРОНДЫ МҰРАҒАТ</span></div>
-        </div>
-      </section>
-
-      <section className="archive-section container" id="archive">
-        <div className="section-heading">
-          <div><div className="section-kicker">БІЗДІҢ БАСЫЛЫМДАР</div><h2>Газет мұрағаты</h2><p>Сүйікті газетіңіздің сандарын жылдар бойынша қараңыз.</p></div>
-          <div className="archive-count"><FileText size={19}/><span><b>{issues.length}</b> шығарылым</span></div>
-        </div>
-        <div className="filters">
-          <label className="search-box"><Search size={18}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Нөмірі немесе күні бойынша іздеу..."/></label>
-          <label className="year-select"><CalendarDays size={17}/><select value={year} onChange={e => setYear(e.target.value)}>{years.map(y => <option key={y}>{y}</option>)}</select><ChevronDown size={16}/></label>
-        </div>
-        {visible.length ? <div className="issues-grid">{visible.map(issue => <IssueCard key={issue.id} issue={issue}/>)}</div> :
-          <div className="empty-state"><div className="empty-icon"><BookOpen size={28}/></div><h3>Әзірге газет сандары жүктелмеген</h3><p>Жаңа PDF шығарылымдар жарияланған кезде осы бөлімде көрінеді.</p><span>Алғашқы шығарылым жақында қосылады</span></div>}
-        {filtered.length > 6 && <button className="button button-outline load-more" onClick={() => setShowAll(!showAll)}>{showAll ? 'Аз көрсету' : 'Барлық сандарды көру'} <ArrowRight size={16}/></button>}
-      </section>
-
-      <section className="about-strip" id="about"><div className="container about-inner">
-        <div className="about-icon"><BookOpen size={27}/></div><div><div className="section-kicker">БІЗ ТУРАЛЫ</div><h2>Торғай тарихы — ұрпаққа аманат</h2><p>«Торғай тынысы» газетінің электронды мұрағаты. Мұнда басылымның PDF форматындағы сандары жинақталып, оқырман назарына ұсынылады.</p></div>
-      </div></section>
-    </main>
-    <footer id="contact"><div className="container footer-inner">
-      <div className="footer-brand"><LogoPlaceholder/><div><strong>Торғай тынысы</strong><span>Электронды газет мұрағаты</span></div></div>
-      <div className="footer-note">© {new Date().getFullYear()} «Торғай тынысы». Барлық құқықтар қорғалған.</div>
-      <a className="back-top" href="#home">Жоғарыға <ArrowRight size={15}/></a>
-    </div></footer>
-  </>;
-}
-
-export default App;
+import {useEffect,useMemo,useState} from 'react';
+import {ArrowDownToLine,ArrowRight,BookOpen,CalendarDays,ChevronDown,FileText,Menu,Search,X,LockKeyhole,LogOut,UploadCloud,Trash2,ExternalLink,AlertCircle,CheckCircle2} from 'lucide-react';
+import {auth,db,firebaseReady,uploadApi} from './firebase';
+import {onAuthStateChanged,signInWithEmailAndPassword,signOut,getIdTokenResult} from 'firebase/auth';
+import {addDoc,collection,deleteDoc,doc,onSnapshot,orderBy,query} from 'firebase/firestore';
+const years=['Барлық жыл',...Array.from({length:12},(_,i)=>String(new Date().getFullYear()-i))];
+const fmt=v=>v?new Intl.DateTimeFormat('kk-KZ',{day:'numeric',month:'long',year:'numeric'}).format(new Date(v+'T00:00:00')):'';
+function Logo(){return <div className="logo-placeholder"><b>ТТ</b><small>ЛОГОТИП</small></div>}
+function Header(){const [open,setOpen]=useState(false);return <header className="site-header"><div className="topline"><div className="container topline-inner"><span>Аудандық қоғамдық-саяси газет</span><span>Торғай өңірінің тынысы</span></div></div><div className="container header-main"><a className="brand" href="/"><Logo/><span className="brand-copy"><strong>Торғай тынысы</strong><small>ЭЛЕКТРОНДЫ ГАЗЕТ МҰРАҒАТЫ</small></span></a><button className="mobile-toggle" onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</button><nav className={open?'main-nav open':'main-nav'}><a href="#home">Басты бет</a><a href="#archive">Газет мұрағаты</a><a href="#about">Біз туралы</a><a href="#contact">Байланыс</a></nav></div></header>}
+function Card({item}){return <article className="issue-card"><div className="cover-wrap">{item.coverUrl?<img className="issue-cover-image" src={item.coverUrl} alt="Газет мұқабасы"/>:<div className="cover-placeholder"><span className="cover-kicker">АУДАНДЫҚ ГАЗЕТ</span><strong>Торғай<br/>тынысы</strong><span className="cover-rule"/><span className="cover-date">{fmt(item.date)}</span><span className="cover-number">№ {item.number}</span></div>}<span className="issue-badge">PDF</span></div><div className="issue-info"><div className="issue-meta"><b>№ {item.number}</b><span>{fmt(item.date)}</span></div><h3>{item.title||'Газеттің жаңа саны'}</h3><div className="issue-actions"><a className="button button-primary" href={item.pdfUrl} target="_blank" rel="noreferrer"><BookOpen size={16}/> Оқу</a><a className="icon-button" href={item.pdfUrl} download><ArrowDownToLine size={18}/></a></div></div></article>}
+function PublicSite(){const [items,setItems]=useState([]),[term,setTerm]=useState(''),[year,setYear]=useState('Барлық жыл'),[loading,setLoading]=useState(firebaseReady);useEffect(()=>{if(!db){setLoading(false);return}return onSnapshot(query(collection(db,'issues'),orderBy('date','desc')),s=>{setItems(s.docs.map(d=>({id:d.id,...d.data()})));setLoading(false)},()=>setLoading(false))},[]);const filtered=useMemo(()=>items.filter(x=>(year==='Барлық жыл'||String(x.year||x.date.slice(0,4))===year)&&(''+x.number+' '+x.date+' '+x.title).toLowerCase().includes(term.toLowerCase())),[items,term,year]);return <><Header/><main id="home"><section className="hero"><div className="container hero-content"><div className="eyebrow">ТОРҒАЙ ӨҢІРІНІҢ ҮНІ</div><h1>Торғай тынысы</h1><p className="hero-lead">Аудандық қоғамдық-саяси газетінің<br/> электронды мұрағаты</p><p className="hero-sub">Өткен күннің шежіресі — бүгінгі ұрпаққа аманат.</p><a className="button button-light" href="#archive">Газет сандарын көру <ArrowRight size={17}/></a><div className="hero-stamp"><span>БАСЫЛЫМ</span><b>ТТ</b><span>ЭЛЕКТРОНДЫ МҰРАҒАТ</span></div></div></section><section className="archive-section container" id="archive"><div className="section-heading"><div><div className="section-kicker">БІЗДІҢ БАСЫЛЫМДАР</div><h2>Газет мұрағаты</h2><p>Газет сандарын жылдар бойынша қараңыз.</p></div><div className="archive-count"><FileText/><b>{items.length}</b> шығарылым</div></div><div className="filters"><label className="search-box"><Search/><input value={term} onChange={e=>setTerm(e.target.value)} placeholder="Нөмірі немесе күні бойынша іздеу..."/></label><label className="year-select"><CalendarDays/><select value={year} onChange={e=>setYear(e.target.value)}>{years.map(y=><option key={y}>{y}</option>)}</select><ChevronDown/></label></div>{loading?<div className="empty-state">Мұрағат жүктелуде...</div>:filtered.length?<div className="issues-grid">{filtered.map(x=><Card key={x.id} item={x}/>)}</div>:<div className="empty-state"><BookOpen size={28}/><h3>Әзірге газет сандары жүктелмеген</h3><p>Жаңа PDF шығарылымдар жарияланған кезде осы бөлімде көрінеді.</p></div>}</section><section className="about-strip" id="about"><div className="container about-inner"><BookOpen/><div><div className="section-kicker">БІЗ ТУРАЛЫ</div><h2>Торғай тарихы — ұрпаққа аманат</h2><p>«Торғай тынысы» газетінің электронды мұрағаты. Мұнда басылымның PDF форматындағы сандары жинақталады.</p></div></div></section></main><footer id="contact"><div className="container footer-inner"><div className="footer-brand"><Logo/><strong>Торғай тынысы</strong></div><span>© {new Date().getFullYear()} «Торғай тынысы». Барлық құқықтар қорғалған.</span></div></footer></>}
+async function uploadFile(file,user){if(!uploadApi)throw Error('Cloudflare Worker адресі .env файлына енгізілмеген.');const data=new FormData();data.append('file',file);const token=await user.getIdToken();const res=await fetch(uploadApi+'/upload',{method:'POST',headers:{Authorization:'Bearer '+token},body:data});const result=await res.json();if(!res.ok)throw Error(result.error||'Файл жүктелмеді.');return result}
+function Admin(){const [user,setUser]=useState(null),[isAdmin,setIsAdmin]=useState(false),[checking,setChecking]=useState(true),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[items,setItems]=useState([]),[number,setNumber]=useState(''),[date,setDate]=useState(new Date().toISOString().slice(0,10)),[title,setTitle]=useState(''),[pdf,setPdf]=useState(null),[cover,setCover]=useState(null),[busy,setBusy]=useState(false),[msg,setMsg]=useState(''),[error,setError]=useState('');useEffect(()=>{if(!auth){setChecking(false);return}return onAuthStateChanged(auth,async u=>{setUser(u);if(u){try{const t=await getIdTokenResult(u,true);setIsAdmin(t.claims.admin===true)}catch{setIsAdmin(false)}}else setIsAdmin(false);setChecking(false)})},[]);useEffect(()=>{if(!isAdmin||!db)return;return onSnapshot(query(collection(db,'issues'),orderBy('date','desc')),s=>setItems(s.docs.map(d=>({id:d.id,...d.data()}))))},[isAdmin]);async function login(e){e.preventDefault();setBusy(true);setError('');try{await signInWithEmailAndPassword(auth,email,password)}catch{setError('Кіру мүмкін болмады. Деректерді тексеріңіз.')}finally{setBusy(false)}}async function publish(e){e.preventDefault();setError('');setMsg('');if(!number||!date||!pdf){setError('Нөмірін, күнін және PDF файлын толтырыңыз.');return}if(pdf.type!=='application/pdf'){setError('Тек PDF файлын таңдаңыз.');return}setBusy(true);try{const p=await uploadFile(pdf,user),c=cover?await uploadFile(cover,user):null;await addDoc(collection(db,'issues'),{number:number.trim(),date,year:date.slice(0,4),title:title.trim(),pdfKey:p.key,pdfUrl:p.url,coverKey:c?.key||'',coverUrl:c?.url||'',createdAt:new Date().toISOString(),createdBy:user.uid});setNumber('');setTitle('');setPdf(null);setCover(null);e.target.reset();setMsg('Газет мұрағатқа сәтті қосылды.')}catch(err){setError(err.message)}finally{setBusy(false)}}async function remove(x){if(!confirm('№ '+x.number+' шығарылымын өшіресіз бе?'))return;try{const token=await user.getIdToken();await fetch(uploadApi+'/delete',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({keys:[x.pdfKey,x.coverKey].filter(Boolean)})});await deleteDoc(doc(db,'issues',x.id));setMsg('Шығарылым өшірілді.')}catch(e){setError(e.message)}}return <div className="admin-page"><div className="admin-header"><a className="brand" href="/"><Logo/><span className="brand-copy"><strong>Торғай тынысы</strong><small>РЕДАКЦИЯ БАСҚАРУ ЖҮЙЕСІ</small></span></a><a href="/">Сайтты көру <ExternalLink size={14}/></a></div><main className="admin-container">{!firebaseReady?<div className="admin-notice"><AlertCircle/><h2>Firebase баптауы қажет</h2><p>.env.example файлын .env деп көшіріп, Firebase деректерін енгізіңіз.</p></div>:checking?<p>Тексерілуде...</p>:!user?<form className="admin-login" onSubmit={login}><LockKeyhole/><h1>Әкімші панелі</h1><p>Жүйеге кіру</p><label>Электрондық пошта<input type="email" required value={email} onChange={e=>setEmail(e.target.value)}/></label><label>Құпиясөз<input type="password" required value={password} onChange={e=>setPassword(e.target.value)}/></label>{error&&<div className="notice error">{error}</div>}<button className="button button-primary admin-submit" disabled={busy}>{busy?'Күте тұрыңыз...':'Кіру'}</button></form>:!isAdmin?<div className="admin-notice"><AlertCircle/><h2>Әкімші құқығы жоқ</h2><p>Бұл аккаунтқа Firebase custom claim арқылы admin: true рөлі берілуі керек.</p><button className="button button-outline" onClick={()=>signOut(auth)}>Шығу</button></div>:<><div className="admin-top"><div><div className="section-kicker">ТОРҒАЙ ТЫНЫСЫ</div><h1>Әкімші панелі</h1><p>{user.email}</p></div><button className="button button-outline" onClick={()=>signOut(auth)}><LogOut/> Шығу</button></div>{msg&&<div className="notice success"><CheckCircle2/>{msg}</div>}{error&&<div className="notice error"><AlertCircle/>{error}</div>}<div className="admin-columns"><form className="admin-form" onSubmit={publish}><div className="admin-form-heading"><UploadCloud/><div><h2>Жаңа газет санын қосу</h2><p>PDF және мұқаба файлын жүктеңіз.</p></div></div><label>Газет нөмірі<input required value={number} onChange={e=>setNumber(e.target.value)} placeholder="Мысалы: 12"/></label><label>Шыққан күні<input required type="date" value={date} onChange={e=>setDate(e.target.value)}/></label><label>Қысқаша атауы (міндетті емес)<input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Газет санының атауы"/></label><label className="file-drop"><FileText/><span><b>Газет PDF файлы *</b><small>{pdf?.name||'PDF таңдаңыз, 50 МБ дейін'}</small></span><input required type="file" accept="application/pdf,.pdf" onChange={e=>setPdf(e.target.files?.[0]||null)}/></label><label className="file-drop"><UploadCloud/><span><b>Газет мұқабасы</b><small>{cover?.name||'PNG, JPG немесе WebP (міндетті емес)'}</small></span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>setCover(e.target.files?.[0]||null)}/></label><button className="button button-primary admin-submit" disabled={busy}>{busy?'Жүктелуде...':'Мұрағатқа жариялау'} <ArrowRight/></button></form><section className="admin-list"><div className="admin-form-heading"><FileText/><div><h2>Жарияланған сандар</h2><p>{items.length} шығарылым</p></div></div>{items.map(x=><div className="admin-issue" key={x.id}>{x.coverUrl?<img src={x.coverUrl} alt=""/>:<div className="admin-mini-cover">ТТ</div>}<div className="admin-issue-copy"><b>№ {x.number}</b><span>{fmt(x.date)}</span><a href={x.pdfUrl} target="_blank" rel="noreferrer">PDF ашу <ExternalLink size={12}/></a></div><button className="delete-button" onClick={()=>remove(x)}><Trash2/></button></div>)}</section></div></>}</main></div>}
+export default function App(){return location.pathname.startsWith('/admin')?<Admin/>:<PublicSite/>}

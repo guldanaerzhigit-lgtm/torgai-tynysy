@@ -1,0 +1,9 @@
+name = "torgai-tynysy-files"
+main = "src/index.js"
+compatibility_date = "2026-10-31"
+[[r2_buckets]]
+binding = "NEWSPAPER_BUCKET"
+bucket_name = "torgai-tynysy-files"
+[vars]
+FIREBASE_PROJECT_ID = "YOUR_FIREBASE_PROJECT_ID"
+ALLOWED_ORIGINS = "https://YOUR_SITE.pages.dev,http://localhost:5173"
