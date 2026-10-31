@@ -7,5 +7,16 @@ service cloud.firestore {
    allow create: if isAdmin() && request.resource.data.number is string && request.resource.data.date is string && request.resource.data.pdfUrl is string && request.resource.data.pdfKey is string;
    allow update,delete: if isAdmin();
   }
+  match /issueViews/{viewId} {
+   allow create: if request.resource.data.keys().hasOnly(['issueId','issueNumber','day','visitorId','viewedAt'])
+    && request.resource.data.issueId is string
+    && request.resource.data.issueNumber is string
+    && request.resource.data.day is string
+    && request.resource.data.visitorId is string
+    && request.resource.data.viewedAt is timestamp
+    && viewId == request.resource.data.issueId + '_' + request.resource.data.day + '_' + request.resource.data.visitorId;
+   allow read: if isAdmin();
+   allow update,delete: if false;
+  }
  }
 }
