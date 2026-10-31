@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useState} from 'react';
+import React, {useEffect,useMemo,useState} from 'react';
 import {ArrowDownToLine,ArrowRight,BookOpen,CalendarDays,ChevronDown,FileText,Menu,Search,X,LockKeyhole,LogOut,UploadCloud,Trash2,ExternalLink,AlertCircle,CheckCircle2} from 'lucide-react';
 import {auth,db,firebaseReady,uploadApi} from './firebase';
 import {onAuthStateChanged,signInWithEmailAndPassword,signOut,getIdTokenResult} from 'firebase/auth';
