@@ -58,3 +58,13 @@
 .pdf-find-results button b{font-size:12px;color:#8b6337}
 .pdf-find-results button span{font-size:13px;line-height:1.45}
 @media(max-width:600px){.pdf-find-bar{gap:7px;padding:10px}.pdf-find-bar button{padding:10px}.pdf-find-bar input{font-size:13px}}
+
+
+.stats-panel{margin:0 0 24px;padding:22px;background:#fff;border:1px solid #e5e9ef;border-radius:16px;box-shadow:0 8px 24px rgba(20,38,62,.05)}
+.stats-panel h2{margin:0 0 5px;font-size:20px}.stats-panel h3{margin:20px 0 10px;font-size:15px}
+.stats-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.stats-cards>div{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:12px;background:#f4f6fa}
+.stats-cards span{font-size:13px;color:#64748b}.stats-cards b{font-size:30px;color:#243b5a}
+.stats-row{display:flex;justify-content:space-between;gap:12px;padding:10px 2px;border-bottom:1px solid #edf0f4;font-size:14px}
+.stats-panel>small{display:block;margin-top:14px;color:#8792a1;line-height:1.5}
+@media(max-width:600px){.stats-panel{padding:16px}.stats-cards b{font-size:25px}}
