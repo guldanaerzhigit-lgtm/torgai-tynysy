@@ -17,4 +17,5 @@ const app = firebaseReady ? (getApps()[0] || initializeApp(config)) : null;
 
 export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
-export const uploadApi = (import.meta.env.VITE_UPLOAD_API_URL || '').replace(/\/$/, '');
+const workerUrl = import.meta.env.VITE_UPLOAD_API_URL || '';
+export const uploadApi = workerUrl.endsWith('/') ? workerUrl.slice(0, -1) : workerUrl;
