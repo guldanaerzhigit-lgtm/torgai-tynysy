@@ -1,23 +1,27 @@
 rules_version = '2';
 service cloud.firestore {
  match /databases/{database}/documents {
-  function isAdmin(){return request.auth!=null && request.auth.token.admin==true && request.auth.token.email_verified==true;}
+  function verified(){return request.auth!=null && request.auth.token.email_verified==true;}
+  function role(){return request.auth.token.role;}
+  function superAdmin(){return verified() && (role()=='superadmin' || request.auth.token.admin==true);}
+  function hasRole(r){return verified() && (superAdmin() || role()==r);}
+  function canSeeStats(){return hasRole('superadmin') || hasRole('editor') || hasRole('archivist') || hasRole('viewer');}
   match /issues/{id} {
    allow read: if true;
-   allow create: if isAdmin() && request.resource.data.number is string && request.resource.data.date is string && request.resource.data.pdfUrl is string && request.resource.data.pdfKey is string;
-   allow update,delete: if isAdmin();
+   allow create: if hasRole('archivist') && request.resource.data.number is string && request.resource.data.date is string && request.resource.data.pdfUrl is string && request.resource.data.pdfKey is string;
+   allow update,delete: if hasRole('archivist');
   }
   match /siteSettings/{settingId} {
    allow read: if true;
-   allow create,update,delete: if isAdmin();
+   allow create,update,delete: if superAdmin();
   }
   match /historyImages/{imageId} {
    allow read: if true;
-   allow create,update,delete: if isAdmin();
+   allow create,update,delete: if hasRole('archivist');
   }
   match /articles/{articleId} {
    allow read: if true;
-   allow create,update,delete: if isAdmin();
+   allow create,update,delete: if hasRole('editor');
   }
   match /issueViews/{viewId} {
    allow create: if request.resource.data.keys().hasOnly(['issueId','issueNumber','day','visitorId','viewedAt'])
@@ -27,7 +31,7 @@ service cloud.firestore {
     && request.resource.data.visitorId is string
     && request.resource.data.viewedAt is timestamp
     && viewId == request.resource.data.issueId + '_' + request.resource.data.day + '_' + request.resource.data.visitorId;
-   allow read: if isAdmin();
+   allow read: if canSeeStats();
    allow update,delete: if false;
   }
  }
