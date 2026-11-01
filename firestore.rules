@@ -11,6 +11,14 @@ service cloud.firestore {
    allow read: if true;
    allow create,update,delete: if isAdmin();
   }
+  match /historyImages/{imageId} {
+   allow read: if true;
+   allow create,update,delete: if isAdmin();
+  }
+  match /articles/{articleId} {
+   allow read: if true;
+   allow create,update,delete: if isAdmin();
+  }
   match /issueViews/{viewId} {
    allow create: if request.resource.data.keys().hasOnly(['issueId','issueNumber','day','visitorId','viewedAt'])
     && request.resource.data.issueId is string
